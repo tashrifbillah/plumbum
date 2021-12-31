@@ -923,6 +923,21 @@ class Application:
 
         for switch_info, prefix, color in switchs(by_groups, True):
             help = switch_info.help  # @ReservedAssignment
+
+            # break and join multi-line help message
+            max_width= 200
+            indent_size= 8
+            indent=' ' * indent_size
+            help= '\n'.join([
+                line for lst in map(
+                    TextWrapper(width=max_width,
+                                initial_indent=indent,
+                                subsequent_indent=indent).wrap,
+                    help.splitlines()
+                )
+                for line in lst
+            ])
+            
             if switch_info.list:
                 help += T_("; may be given multiple times")
             if switch_info.mandatory:
@@ -941,10 +956,11 @@ class Application:
                         for switch in switch_info.excludes
                     )
                 )
+            # msg = indentation.join(
+            #     wrapper.wrap(" ".join(ln.strip() for ln in help.splitlines()))
+            # )
 
-            msg = indentation.join(
-                wrapper.wrap(" ".join(ln.strip() for ln in help.splitlines()))
-            )
+            msg = help
 
             if len(prefix) + wrapper.width >= cols:
                 padding = indentation
